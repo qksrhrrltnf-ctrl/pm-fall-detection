@@ -318,6 +318,74 @@
             font-size: 48px;
             margin-bottom: 16px;
         }
+        
+        /* Demo Button */
+        .demo-btn {
+            width: 100%;
+            padding: 12px 20px;
+            margin-top: 16px;
+            background: linear-gradient(135deg, var(--accent) 0%, #ff8c5a 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        
+        .demo-btn:active {
+            transform: translateY(0);
+        }
+        
+        .demo-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .demo-btn .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Auto-sim indicator */
+        .auto-sim-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: var(--bg-dark);
+            border-radius: 6px;
+        }
+        
+        .auto-sim-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
     </style>
 </head>
 <body>
@@ -335,6 +403,14 @@
                         <div class="stat-value" id="todayEvents">0</div>
                         <div class="stat-label">오늘 발생</div>
                     </div>
+                </div>
+                <button class="demo-btn" id="demoBtn" onclick="generateDemoEvents()">
+                    <span>🎲</span>
+                    <span id="demoBtnText">데모 이벤트 생성</span>
+                </button>
+                <div class="auto-sim-status">
+                    <div class="auto-sim-dot"></div>
+                    <span>자동 시뮬레이션 활성화 (15~30초 간격)</span>
                 </div>
             </div>
             <div class="event-list" id="eventList">
@@ -616,6 +692,35 @@
                 }
             } catch (err) {
                 console.error('Failed to load initial events:', err);
+            }
+        }
+        
+        // Generate demo events
+        async function generateDemoEvents() {
+            const btn = document.getElementById('demoBtn');
+            const btnText = document.getElementById('demoBtnText');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<div class="spinner"></div> 생성 중...';
+            
+            try {
+                const response = await fetch('/demo?count=5', { method: 'POST' });
+                const data = await response.json();
+                
+                btnText.textContent = `✅ ${data.events_created}개 생성됨!`;
+                
+                setTimeout(() => {
+                    btnText.innerHTML = '🎲 데모 이벤트 생성';
+                    btn.disabled = false;
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to generate demo events:', err);
+                btnText.textContent = '❌ 오류 발생';
+                
+                setTimeout(() => {
+                    btnText.innerHTML = '🎲 데모 이벤트 생성';
+                    btn.disabled = false;
+                }, 2000);
             }
         }
         
