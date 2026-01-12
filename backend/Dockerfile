@@ -15,8 +15,8 @@ COPY app ./app
 # Create data directory for SQLite
 RUN mkdir -p /app/data
 
-# Expose port
-EXPOSE 8000
+# Expose port (Render uses PORT env variable)
+EXPOSE 10000
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application with PORT from environment variable
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}
